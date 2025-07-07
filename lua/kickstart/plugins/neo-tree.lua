@@ -10,14 +10,22 @@ return {
     'MunifTanjim/nui.nvim',
   },
   lazy = false,
+  --  config = function()
+  --    require('neo-tree').setup {
+  --      source_selector = {
+  --        winbar = false,
+  --        statusline = false,
+  --      },
+  --    }
+  --  end,
   keys = {
-    { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '||', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
     filesystem = {
       window = {
         mappings = {
-          ['\\'] = 'close_window',
+          ['||'] = 'close_window',
         },
       },
     },
