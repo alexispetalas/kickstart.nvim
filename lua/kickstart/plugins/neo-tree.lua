@@ -9,7 +9,7 @@ return {
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',
   },
-  lazy = false,
+  lazy = true,
   --  config = function()
   --    require('neo-tree').setup {
   --      source_selector = {
@@ -23,9 +23,11 @@ return {
   },
   opts = {
     filesystem = {
+      follow_current_file = true, -- This will follow the current file in the tree
       window = {
         mappings = {
           ['||'] = 'close_window',
+          ['Z'] = 'expand_all_nodes',
         },
       },
     },
