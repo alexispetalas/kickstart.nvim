@@ -129,7 +129,7 @@ return {
         end,
       }
       
-      lint.linters.golangci_lint = {
+      lint.linters['golangci-lint'] = {
         cmd = 'golangci-lint',
         stdin = false,
         append_fname = false,

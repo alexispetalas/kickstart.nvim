@@ -361,19 +361,19 @@ require('lazy').setup({
     'nvim-telescope/telescope.nvim',
     cmd = 'Telescope',
     keys = {
-      { '<leader>sh', desc = '[S]earch [H]elp' },
-      { '<leader>sk', desc = '[S]earch [K]eymaps' },
-      { '<leader>sf', desc = '[S]earch [F]iles' },
-      { '<leader>ss', desc = '[S]earch [S]elect Telescope' },
-      { '<leader>sw', desc = '[S]earch current [W]ord' },
-      { '<leader>sg', desc = '[S]earch by [G]rep' },
-      { '<leader>sd', desc = '[S]earch [D]iagnostics' },
-      { '<leader>sr', desc = '[S]earch [R]esume' },
-      { '<leader>s.', desc = '[S]earch Recent Files' },
-      { '<leader><leader>', desc = '[ ] Find existing buffers' },
-      { '<leader>/', desc = '[/] Fuzzily search in current buffer' },
-      { '<leader>s/', desc = '[S]earch [/] in Open Files' },
-      { '<leader>sn', desc = '[S]earch [N]eovim files' },
+      { '<leader>sh', function() require('telescope.builtin').help_tags() end, desc = '[S]earch [H]elp' },
+      { '<leader>sk', function() require('telescope.builtin').keymaps() end, desc = '[S]earch [K]eymaps' },
+      { '<leader>sf', function() require('telescope.builtin').find_files() end, desc = '[S]earch [F]iles' },
+      { '<leader>ss', function() require('telescope.builtin').builtin() end, desc = '[S]earch [S]elect Telescope' },
+      { '<leader>sw', function() require('telescope.builtin').grep_string() end, desc = '[S]earch current [W]ord' },
+      { '<leader>sg', function() require('telescope.builtin').live_grep() end, desc = '[S]earch by [G]rep' },
+      { '<leader>sd', function() require('telescope.builtin').diagnostics() end, desc = '[S]earch [D]iagnostics' },
+      { '<leader>sr', function() require('telescope.builtin').resume() end, desc = '[S]earch [R]esume' },
+      { '<leader>s.', function() require('telescope.builtin').oldfiles() end, desc = '[S]earch Recent Files' },
+      { '<leader><leader>', function() require('telescope.builtin').buffers() end, desc = '[ ] Find existing buffers' },
+      { '<leader>/', function() require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_ivy { winblend = 10, previewer = false }) end, desc = '[/] Fuzzily search in current buffer' },
+      { '<leader>s/', function() require('telescope.builtin').live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' } end, desc = '[S]earch [/] in Open Files' },
+      { '<leader>sn', function() require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' } end, desc = '[S]earch [N]eovim files' },
     },
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -909,25 +909,25 @@ require('lazy').setup({
 
         -- Bash
         bashls = {},
-        
+
         -- Docker
         dockerls = {},
-        
+
         -- HTML
         html = {
           filetypes = { 'html', 'templ' },
         },
-        
+
         -- CSS
         cssls = {},
-        
+
         -- Tailwind CSS
         tailwindcss = {
           root_dir = function(...)
-            return require('lspconfig.util').root_pattern('.git')(...)
+            return require('lspconfig.util').root_pattern '.git'(...)
           end,
         },
-        
+
         -- Markdown
         marksman = {},
       }
@@ -957,7 +957,7 @@ require('lazy').setup({
         'rustfmt', -- Rust formatter
         'shfmt', -- Shell script formatter
         'taplo', -- TOML formatter
-        
+
         -- Linters
         'eslint_d', -- TypeScript/JavaScript linter
         'pylint', -- Python linter
@@ -965,7 +965,7 @@ require('lazy').setup({
         'golangci-lint', -- Go linter
         'markdownlint', -- Markdown linter
         'jsonlint', -- JSON linter
-        
+
         -- Debug adapters
         'debugpy', -- Python debugger
         'delve', -- Go debugger
@@ -1211,7 +1211,7 @@ require('lazy').setup({
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- require('mini.surround').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -1341,22 +1341,22 @@ require('lazy').setup({
         if statusline.is_truncated(args.trunc_width) then
           return ''
         end
-        
+
         local head = vim.b.gitsigns_head or vim.g.gitsigns_head
         if not head or head == '' then
           return ''
         end
-        
+
         local status = vim.b.gitsigns_status_dict or {}
         local added = status.added and status.added > 0 and ('+' .. status.added) or ''
         local changed = status.changed and status.changed > 0 and ('~' .. status.changed) or ''
         local removed = status.removed and status.removed > 0 and ('-' .. status.removed) or ''
-        
+
         local git_info = head
         if added ~= '' or changed ~= '' or removed ~= '' then
           git_info = git_info .. '[' .. added .. changed .. removed .. ']'
         end
-        
+
         return (vim.g.have_nerd_font and ' ' or 'Git:') .. git_info
       end
 
@@ -1366,17 +1366,17 @@ require('lazy').setup({
         if statusline.is_truncated(args.trunc_width) then
           return ''
         end
-        
+
         local count = vim.diagnostic.count(0)
         local errors = count[vim.diagnostic.severity.ERROR] or 0
         local warnings = count[vim.diagnostic.severity.WARN] or 0
         local info = count[vim.diagnostic.severity.INFO] or 0
         local hints = count[vim.diagnostic.severity.HINT] or 0
-        
+
         if errors + warnings + info + hints == 0 then
           return ''
         end
-        
+
         local parts = {}
         if errors > 0 then
           table.insert(parts, (vim.g.have_nerd_font and '󰅚 ' or 'E:') .. errors)
@@ -1390,7 +1390,7 @@ require('lazy').setup({
         if hints > 0 then
           table.insert(parts, (vim.g.have_nerd_font and '󰌶 ' or 'H:') .. hints)
         end
-        
+
         return table.concat(parts, ' ')
       end
 

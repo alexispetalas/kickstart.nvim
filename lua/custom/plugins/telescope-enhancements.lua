@@ -73,11 +73,11 @@ return {
       { '<leader>sy', '<cmd>Telescope filetypes<cr>', desc = '[S]earch file t[Y]pes' },
       
       -- Git operations
-      { '<leader>sgb', '<cmd>Telescope git_branches<cr>', desc = '[S]earch [G]it [B]ranches' },
-      { '<leader>sgc', '<cmd>Telescope git_commits<cr>', desc = '[S]earch [G]it [C]ommits' },
-      { '<leader>sgC', '<cmd>Telescope git_bcommits<cr>', desc = '[S]earch [G]it buffer [C]ommits' },
-      { '<leader>sgs', '<cmd>Telescope git_status<cr>', desc = '[S]earch [G]it [S]tatus' },
-      { '<leader>sgt', '<cmd>Telescope git_stash<cr>', desc = '[S]earch [G]it s[T]ash' },
+      { '<leader>sGb', '<cmd>Telescope git_branches<cr>', desc = '[S]earch [G]it [B]ranches' },
+      { '<leader>sGc', '<cmd>Telescope git_commits<cr>', desc = '[S]earch [G]it [C]ommits' },
+      { '<leader>sGC', '<cmd>Telescope git_bcommits<cr>', desc = '[S]earch [G]it buffer [C]ommits' },
+      { '<leader>sGs', '<cmd>Telescope git_status<cr>', desc = '[S]earch [G]it [S]tatus' },
+      { '<leader>sGt', '<cmd>Telescope git_stash<cr>', desc = '[S]earch [G]it s[T]ash' },
       
       -- LSP operations
       { '<leader>sld', '<cmd>Telescope diagnostics<cr>', desc = '[S]earch [L]SP [D]iagnostics' },
