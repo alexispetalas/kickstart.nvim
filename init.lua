@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -359,7 +359,22 @@ require('lazy').setup({
 
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
+    cmd = 'Telescope',
+    keys = {
+      { '<leader>sh', desc = '[S]earch [H]elp' },
+      { '<leader>sk', desc = '[S]earch [K]eymaps' },
+      { '<leader>sf', desc = '[S]earch [F]iles' },
+      { '<leader>ss', desc = '[S]earch [S]elect Telescope' },
+      { '<leader>sw', desc = '[S]earch current [W]ord' },
+      { '<leader>sg', desc = '[S]earch by [G]rep' },
+      { '<leader>sd', desc = '[S]earch [D]iagnostics' },
+      { '<leader>sr', desc = '[S]earch [R]esume' },
+      { '<leader>s.', desc = '[S]earch Recent Files' },
+      { '<leader><leader>', desc = '[ ] Find existing buffers' },
+      { '<leader>/', desc = '[/] Fuzzily search in current buffer' },
+      { '<leader>s/', desc = '[S]earch [/] in Open Files' },
+      { '<leader>sn', desc = '[S]earch [N]eovim files' },
+    },
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -416,6 +431,26 @@ require('lazy').setup({
           ['ui-select'] = {
             require('telescope.themes').get_ivy(),
           },
+          file_browser = {
+            theme = 'ivy',
+            hijack_netrw = true,
+          },
+          live_grep_args = {
+            auto_quoting = true,
+          },
+          project = {
+            base_dirs = {
+              { '~/projects', max_depth = 2 },
+              { '~/work', max_depth = 2 },
+              { '~/.config', max_depth = 1 },
+            },
+            hidden_files = true,
+            theme = 'dropdown',
+          },
+          undo = {
+            use_delta = true,
+            side_by_side = false,
+          },
         },
       }
 
@@ -439,7 +474,7 @@ require('lazy').setup({
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_ivy {
           winblend = 10,
           previewer = false,
         })
@@ -629,8 +664,16 @@ require('lazy').setup({
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
-        float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        update_in_insert = false,
+        float = {
+          border = 'rounded',
+          source = 'if_many',
+          header = '',
+          prefix = '',
+          focusable = false,
+          close_events = { 'BufLeave', 'CursorMoved', 'InsertEnter', 'FocusLost' },
+        },
+        underline = { severity = { min = vim.diagnostic.severity.WARN } },
         signs = vim.g.have_nerd_font and {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
@@ -642,17 +685,30 @@ require('lazy').setup({
         virtual_text = {
           source = 'if_many',
           spacing = 2,
+          prefix = '●',
+          severity = { min = vim.diagnostic.severity.WARN },
           format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
+            local max_width = math.min(math.floor(vim.o.columns * 0.7), 120)
+            local message = diagnostic.message
+            if #message > max_width then
+              message = message:sub(1, max_width - 3) .. '...'
+            end
+            return message
           end,
         },
       }
+
+      -- Enhanced diagnostic keymaps
+      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
+      vim.keymap.set('n', '[D', function()
+        vim.diagnostic.goto_prev { severity = vim.diagnostic.severity.ERROR }
+      end, { desc = 'Go to previous [D]iagnostic error' })
+      vim.keymap.set('n', ']D', function()
+        vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR }
+      end, { desc = 'Go to next [D]iagnostic error' })
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -670,13 +726,70 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
-        gopls = {},
+        -- C/C++
+        clangd = {
+          cmd = {
+            'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--header-insertion=iwyu',
+            '--completion-style=detailed',
+            '--function-arg-placeholders',
+            '--fallback-style=llvm',
+          },
+          init_options = {
+            usePlaceholders = true,
+            completeUnimported = true,
+            clangdFileStatus = true,
+          },
+        },
+
+        -- Go
+        gopls = {
+          settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                fieldalignment = true,
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
+              semanticTokens = true,
+            },
+          },
+        },
+
+        -- Python
         pyright = {
           before_init = function(_, config)
             local venv_path = vim.fn.system('poetry env info -p'):gsub('\n', '')
             if vim.fn.isdirectory(venv_path) == 1 then
-              config.settings.python.pythonPath = venv_path .. '~/.pyenv/shims/python3'
+              config.settings.python.pythonPath = venv_path .. '/bin/python'
             end
           end,
           settings = {
@@ -685,34 +798,138 @@ require('lazy').setup({
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
                 diagnosticMode = 'workspace',
+                typeCheckingMode = 'basic',
               },
             },
           },
         },
-        -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-        --
 
+        -- Rust
+        rust_analyzer = {
+          settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
+              },
+              checkOnSave = {
+                allFeatures = true,
+                command = 'clippy',
+                extraArgs = { '--no-deps' },
+              },
+              procMacro = {
+                enable = true,
+                ignored = {
+                  ['async-trait'] = { 'async_trait' },
+                  ['napi-derive'] = { 'napi' },
+                  ['async-recursion'] = { 'async_recursion' },
+                },
+              },
+            },
+          },
+        },
+
+        -- TypeScript/JavaScript
+        ts_ls = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'literal',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = false,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            javascript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        },
+
+        -- JSON
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
+
+        -- YAML
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = {
+                enable = false,
+                url = '',
+              },
+              schemas = require('schemastore').yaml.schemas(),
+            },
+          },
+        },
+
+        -- Lua
         lua_ls = {
-          -- cmd = { ... },
-          -- filetypes = { ... },
-          -- capabilities = {},
           settings = {
             Lua = {
+              runtime = { version = 'LuaJIT' },
+              workspace = {
+                checkThirdParty = false,
+                library = {
+                  '${3rd}/luv/library',
+                  unpack(vim.api.nvim_get_runtime_file('', true)),
+                },
+              },
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
+              diagnostics = {
+                disable = { 'missing-fields' },
+              },
+              hint = {
+                enable = true,
+                arrayIndex = 'Disable',
+              },
             },
           },
         },
+
+        -- Bash
+        bashls = {},
+        
+        -- Docker
+        dockerls = {},
+        
+        -- HTML
+        html = {
+          filetypes = { 'html', 'templ' },
+        },
+        
+        -- CSS
+        cssls = {},
+        
+        -- Tailwind CSS
+        tailwindcss = {
+          root_dir = function(...)
+            return require('lspconfig.util').root_pattern('.git')(...)
+          end,
+        },
+        
+        -- Markdown
+        marksman = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -730,7 +947,29 @@ require('lazy').setup({
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
+        -- Formatters
         'stylua', -- Used to format Lua code
+        'prettier', -- TypeScript/JavaScript/HTML/CSS formatter
+        'black', -- Python formatter
+        'isort', -- Python import sorter
+        'goimports', -- Go import organizer
+        'gofumpt', -- Go formatter
+        'rustfmt', -- Rust formatter
+        'shfmt', -- Shell script formatter
+        'taplo', -- TOML formatter
+        
+        -- Linters
+        'eslint_d', -- TypeScript/JavaScript linter
+        'pylint', -- Python linter
+        'shellcheck', -- Shell script linter
+        'golangci-lint', -- Go linter
+        'markdownlint', -- Markdown linter
+        'jsonlint', -- JSON linter
+        
+        -- Debug adapters
+        'debugpy', -- Python debugger
+        'delve', -- Go debugger
+        'js-debug-adapter', -- JavaScript/TypeScript debugger
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -783,18 +1022,52 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        python = { 'isort', 'black' },
+        go = { 'goimports', 'gofumpt' },
+        rust = { 'rustfmt' },
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        javascriptreact = { 'prettier' },
+        typescriptreact = { 'prettier' },
+        vue = { 'prettier' },
+        css = { 'prettier' },
+        scss = { 'prettier' },
+        less = { 'prettier' },
+        html = { 'prettier' },
+        json = { 'prettier' },
+        jsonc = { 'prettier' },
+        yaml = { 'prettier' },
+        markdown = { 'prettier' },
+        graphql = { 'prettier' },
+        handlebars = { 'prettier' },
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
+        zsh = { 'shfmt' },
+        fish = { 'fish_indent' },
+        toml = { 'taplo' },
+        xml = { 'xmlformat' },
+        sql = { 'sqlformat' },
+      },
+      formatters = {
+        black = {
+          prepend_args = { '--fast', '--line-length', '88' },
+        },
+        isort = {
+          prepend_args = { '--profile', 'black' },
+        },
+        prettier = {
+          prepend_args = { '--tab-width', '2', '--single-quote' },
+        },
+        shfmt = {
+          prepend_args = { '-i', '2', '-ci' },
+        },
       },
     },
   },
 
   { -- Autocompletion
     'saghen/blink.cmp',
-    event = 'VimEnter',
+    event = 'InsertEnter',
     version = '1.*',
     dependencies = {
       -- Snippet Engine
@@ -850,7 +1123,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'super-tab',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -945,14 +1218,180 @@ require('lazy').setup({
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup {
+        use_icons = vim.g.have_nerd_font,
+        content = {
+          active = function()
+            local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
+            local git = statusline.section_git { trunc_width = 40 }
+            local diff = statusline.section_diff { trunc_width = 75 }
+            local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
+            local lsp = statusline.section_lsp { trunc_width = 75 }
+            local filename = statusline.section_filename { trunc_width = 140 }
+            local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
+            local location = statusline.section_location { trunc_width = 75 }
+            local search = statusline.section_searchcount { trunc_width = 75 }
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
+            return statusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
+              '%<', -- Mark general truncate point
+              { hl = 'MiniStatuslineFilename', strings = { filename } },
+              '%=', -- End left alignment
+              { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+              { hl = mode_hl, strings = { search, location } },
+            }
+          end,
+          inactive = function()
+            local filename = statusline.section_filename { trunc_width = 140 }
+            return statusline.combine_groups {
+              { hl = 'MiniStatuslineInactive', strings = { filename } },
+              '%=', -- End left alignment
+            }
+          end,
+        },
+        set_vim_settings = false,
+      }
+
+      -- Enhanced sections with more information
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_location = function()
-        return '%2l:%-2v'
+        return '%2l:%-2v %3p%%'
+      end
+
+      -- Add custom section for recording macro
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_mode = function(args)
+        local mode_info = statusline.is_truncated(args.trunc_width) and { mode = 'N', hl = 'MiniStatuslineModeNormal' }
+          or {
+            mode = vim.fn.mode(),
+            hl = ({
+              ['n'] = 'MiniStatuslineModeNormal',
+              ['v'] = 'MiniStatuslineModeVisual',
+              ['V'] = 'MiniStatuslineModeVisual',
+              ['\22'] = 'MiniStatuslineModeVisual',
+              ['s'] = 'MiniStatuslineModeVisual',
+              ['S'] = 'MiniStatuslineModeVisual',
+              ['\19'] = 'MiniStatuslineModeVisual',
+              ['i'] = 'MiniStatuslineModeInsert',
+              ['ic'] = 'MiniStatuslineModeInsert',
+              ['R'] = 'MiniStatuslineModeReplace',
+              ['Rv'] = 'MiniStatuslineModeReplace',
+              ['c'] = 'MiniStatuslineModeCommand',
+              ['cv'] = 'MiniStatuslineModeCommand',
+              ['ce'] = 'MiniStatuslineModeCommand',
+              ['r'] = 'MiniStatuslineModeCommand',
+              ['rm'] = 'MiniStatuslineModeCommand',
+              ['r?'] = 'MiniStatuslineModeCommand',
+              ['!'] = 'MiniStatuslineModeCommand',
+              ['t'] = 'MiniStatuslineModeOther',
+            })[vim.fn.mode()] or 'MiniStatuslineModeOther',
+          }
+
+        local mode_string = ({
+          ['n'] = 'NORMAL',
+          ['no'] = 'OP',
+          ['nov'] = 'OP',
+          ['noV'] = 'OP',
+          ['no\22'] = 'OP',
+          ['niI'] = 'NORMAL',
+          ['niR'] = 'NORMAL',
+          ['niV'] = 'NORMAL',
+          ['nt'] = 'NORMAL',
+          ['v'] = 'VISUAL',
+          ['vs'] = 'VISUAL',
+          ['V'] = 'VISUAL LINE',
+          ['Vs'] = 'VISUAL LINE',
+          ['\22'] = 'VISUAL BLOCK',
+          ['\22s'] = 'VISUAL BLOCK',
+          ['s'] = 'SELECT',
+          ['S'] = 'SELECT LINE',
+          ['\19'] = 'SELECT BLOCK',
+          ['i'] = 'INSERT',
+          ['ic'] = 'INSERT',
+          ['ix'] = 'INSERT',
+          ['R'] = 'REPLACE',
+          ['Rc'] = 'REPLACE',
+          ['Rx'] = 'REPLACE',
+          ['Rv'] = 'VIRT REPLACE',
+          ['Rvc'] = 'VIRT REPLACE',
+          ['Rvx'] = 'VIRT REPLACE',
+          ['c'] = 'COMMAND',
+          ['cv'] = 'VIM EX',
+          ['ce'] = 'EX',
+          ['r'] = 'PROMPT',
+          ['rm'] = 'MORE',
+          ['r?'] = 'CONFIRM',
+          ['!'] = 'SHELL',
+          ['t'] = 'TERMINAL',
+        })[mode_info.mode] or mode_info.mode
+
+        -- Add macro recording indicator
+        local recording = vim.fn.reg_recording()
+        if recording ~= '' then
+          mode_string = mode_string .. ' @' .. recording
+        end
+
+        return mode_string, mode_info.hl
+      end
+
+      -- Enhanced git section
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_git = function(args)
+        if statusline.is_truncated(args.trunc_width) then
+          return ''
+        end
+        
+        local head = vim.b.gitsigns_head or vim.g.gitsigns_head
+        if not head or head == '' then
+          return ''
+        end
+        
+        local status = vim.b.gitsigns_status_dict or {}
+        local added = status.added and status.added > 0 and ('+' .. status.added) or ''
+        local changed = status.changed and status.changed > 0 and ('~' .. status.changed) or ''
+        local removed = status.removed and status.removed > 0 and ('-' .. status.removed) or ''
+        
+        local git_info = head
+        if added ~= '' or changed ~= '' or removed ~= '' then
+          git_info = git_info .. '[' .. added .. changed .. removed .. ']'
+        end
+        
+        return (vim.g.have_nerd_font and ' ' or 'Git:') .. git_info
+      end
+
+      -- Enhanced diagnostics section
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_diagnostics = function(args)
+        if statusline.is_truncated(args.trunc_width) then
+          return ''
+        end
+        
+        local count = vim.diagnostic.count(0)
+        local errors = count[vim.diagnostic.severity.ERROR] or 0
+        local warnings = count[vim.diagnostic.severity.WARN] or 0
+        local info = count[vim.diagnostic.severity.INFO] or 0
+        local hints = count[vim.diagnostic.severity.HINT] or 0
+        
+        if errors + warnings + info + hints == 0 then
+          return ''
+        end
+        
+        local parts = {}
+        if errors > 0 then
+          table.insert(parts, (vim.g.have_nerd_font and '󰅚 ' or 'E:') .. errors)
+        end
+        if warnings > 0 then
+          table.insert(parts, (vim.g.have_nerd_font and '󰀪 ' or 'W:') .. warnings)
+        end
+        if info > 0 then
+          table.insert(parts, (vim.g.have_nerd_font and '󰋽 ' or 'I:') .. info)
+        end
+        if hints > 0 then
+          table.insert(parts, (vim.g.have_nerd_font and '󰌶 ' or 'H:') .. hints)
+        end
+        
+        return table.concat(parts, ' ')
       end
 
       -- ... and there is more!
@@ -961,6 +1400,7 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    event = { 'BufReadPre', 'BufNewFile' },
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
