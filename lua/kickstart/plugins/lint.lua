@@ -77,10 +77,10 @@ return {
         lint.linters_by_ft.json = { 'jsonlint' }
       end
       
-      -- Markdown
-      if vim.fn.executable('markdownlint') == 1 or vim.fn.executable('markdownlint-cli') == 1 then
-        lint.linters_by_ft.markdown = { 'markdownlint' }
-      end
+      -- Markdown (disabled due to noisy warnings)
+      -- if vim.fn.executable('markdownlint') == 1 or vim.fn.executable('markdownlint-cli') == 1 then
+      --   lint.linters_by_ft.markdown = { 'markdownlint' }
+      -- end
       
       -- SQL
       if vim.fn.executable('sqlfluff') == 1 then
