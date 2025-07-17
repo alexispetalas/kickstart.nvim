@@ -23,9 +23,11 @@ return {
   },
   opts = {
     filesystem = {
+      follow_current_file = true, -- This will follow the current file in the tree
       window = {
         mappings = {
           ['||'] = 'close_window',
+          ['Z'] = 'expand_all_nodes',
         },
       },
     },
