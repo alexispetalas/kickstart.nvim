@@ -30,7 +30,7 @@ return {
       -- }
       --
       -- Configure linters by filetype
-      lint.linters_by_ft = lint.linters_by_ft or {}
+      lint.linters_by_ft = {}
       
       -- Enable specific linters for languages we use (only if available)
       -- Python
@@ -107,6 +107,16 @@ return {
       lint.linters_by_ft['text'] = nil
 
       -- Configure specific linters
+      -- Use venv pylint if available
+      local function get_python_path()
+        local venv = os.getenv("VIRTUAL_ENV")
+        if venv then
+          return venv .. "/bin/pylint"
+        end
+        return "pylint"
+      end
+      
+      lint.linters.pylint.cmd = get_python_path()
       lint.linters.pylint.args = {
         '-f',
         'json',

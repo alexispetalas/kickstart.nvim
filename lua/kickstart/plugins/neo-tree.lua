@@ -19,14 +19,14 @@ return {
   --    }
   --  end,
   keys = {
-    { '||', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '|', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
   },
   opts = {
     filesystem = {
       follow_current_file = true, -- This will follow the current file in the tree
       window = {
         mappings = {
-          ['||'] = 'close_window',
+          ['|'] = 'close_window',
           ['Z'] = 'expand_all_nodes',
         },
       },

@@ -38,7 +38,7 @@ return {
     vim.keymap.set('n', '<C-S-P>', function()
       harpoon:list():prev()
     end)
-    vim.keymap.set('n', '<C-S-N>', function()
+    vim.keymap.set('n', '<C-`>', function()
       harpoon:list():next()
     end)
   end,
