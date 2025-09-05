@@ -864,9 +864,41 @@ require('lazy').setup({
         -- Python
         pyright = {
           before_init = function(_, config)
-            local venv_path = vim.fn.system('poetry env info -p'):gsub('\n', '')
-            if vim.fn.isdirectory(venv_path) == 1 then
-              config.settings.python.pythonPath = venv_path .. '/bin/python'
+            -- Function to find Python virtual environment
+            local function find_venv()
+              -- Check for regular venv in current directory or subdirectories
+              local venv_patterns = { 'venv', 'app/venv', '.venv', 'env', '.env' }
+              for _, pattern in ipairs(venv_patterns) do
+                local venv_path = vim.fn.getcwd() .. '/' .. pattern
+                if vim.fn.isdirectory(venv_path .. '/bin') == 1 then
+                  return venv_path .. '/bin/python'
+                end
+              end
+
+              -- Check for Poetry environment
+              local poetry_venv = vim.fn.system('poetry env info -p 2>/dev/null'):gsub('\n', '')
+              if vim.fn.isdirectory(poetry_venv) == 1 then
+                return poetry_venv .. '/bin/python'
+              end
+
+              -- Check for pipenv environment
+              local pipenv_venv = vim.fn.system('pipenv --venv 2>/dev/null'):gsub('\n', '')
+              if vim.fn.isdirectory(pipenv_venv) == 1 then
+                return pipenv_venv .. '/bin/python'
+              end
+
+              -- Check for conda environment
+              local conda_prefix = os.getenv 'CONDA_PREFIX'
+              if conda_prefix and vim.fn.isdirectory(conda_prefix .. '/bin') == 1 then
+                return conda_prefix .. '/bin/python'
+              end
+
+              return nil
+            end
+
+            local python_path = find_venv()
+            if python_path then
+              config.settings.python.pythonPath = python_path
             end
           end,
           settings = {
