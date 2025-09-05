@@ -125,6 +125,116 @@ return {
           return vim.api.nvim_buf_get_name(0)
         end,
       }
+      -- Enhanced pylint configuration with virtual environment support
+      local function get_python_info()
+        -- Function to find Python virtual environment (similar to pyright config)
+        local function find_venv()
+          -- Check for regular venv in current directory or subdirectories
+          local venv_patterns = { 'venv', 'app/venv', '.venv', 'env', '.env' }
+          for _, pattern in ipairs(venv_patterns) do
+            local venv_path = vim.fn.getcwd() .. '/' .. pattern
+            if vim.fn.isdirectory(venv_path .. '/bin') == 1 then
+              return venv_path
+            end
+          end
+
+          -- Check for Poetry environment
+          local poetry_venv = vim.fn.system('poetry env info -p 2>/dev/null'):gsub('\n', '')
+          if vim.fn.isdirectory(poetry_venv) == 1 then
+            return poetry_venv
+          end
+
+          -- Check for pipenv environment
+          local pipenv_venv = vim.fn.system('pipenv --venv 2>/dev/null'):gsub('\n', '')
+          if vim.fn.isdirectory(pipenv_venv) == 1 then
+            return pipenv_venv
+          end
+
+          -- Check for conda environment
+          local conda_prefix = os.getenv 'CONDA_PREFIX'
+          if conda_prefix and vim.fn.isdirectory(conda_prefix .. '/bin') == 1 then
+            return conda_prefix
+          end
+          
+          -- Check VIRTUAL_ENV environment variable
+          local venv = os.getenv("VIRTUAL_ENV")
+          if venv and vim.fn.isdirectory(venv) == 1 then
+            return venv
+          end
+
+          return nil
+        end
+
+        local venv_path = find_venv()
+        if venv_path then
+          local pylint_cmd = venv_path .. '/bin/pylint'
+          local python_path = venv_path .. '/bin/python'
+          -- Check if venv pylint exists, otherwise use system pylint with venv python
+          if vim.fn.executable(pylint_cmd) == 1 then
+            return {
+              cmd = pylint_cmd,
+              python_path = python_path,
+              venv_path = venv_path
+            }
+          else
+            return {
+              cmd = "pylint",
+              python_path = python_path,
+              venv_path = venv_path
+            }
+          end
+        end
+        
+        -- Fallback to system python
+        return {
+          cmd = "pylint",
+          python_path = "python",
+          venv_path = nil
+        }
+      end
+      
+      -- Configure pylint with virtual environment support
+      local python_info = get_python_info()
+      lint.linters.pylint.cmd = python_info.cmd
+      
+      -- Enhanced pylint arguments with dynamic virtual environment support
+      lint.linters.pylint.args = function()
+        local args = {
+          '-f',
+          'json',
+          '--from-stdin',
+        }
+        
+        local python_info = get_python_info()
+        if python_info.venv_path then
+          -- Use the virtual environment's Python interpreter
+          table.insert(args, '--init-hook=import sys; sys.path.insert(0, "' .. python_info.venv_path .. '/lib/python*/site-packages")')
+        end
+        
+        -- Add the filename
+        table.insert(args, vim.api.nvim_buf_get_name(0))
+        
+        return args
+      end
+      
+      -- Enhanced pylint environment setup
+      lint.linters.pylint.env = function()
+        local python_info = get_python_info()
+        local env = {}
+        
+        if python_info.venv_path then
+          env.VIRTUAL_ENV = python_info.venv_path
+          env.PATH = python_info.venv_path .. '/bin:' .. (os.getenv('PATH') or '')
+          
+          -- Find the correct site-packages directory
+          local site_packages = vim.fn.glob(python_info.venv_path .. '/lib/python*/site-packages')
+          if site_packages ~= '' then
+            env.PYTHONPATH = site_packages .. ':' .. (os.getenv('PYTHONPATH') or '')
+          end
+        end
+        
+        return env
+      end
       
       lint.linters.mypy.args = {
         '--show-column-numbers',
@@ -178,6 +288,22 @@ return {
       vim.keymap.set('n', '<leader>l', function()
         lint.try_lint()
       end, { desc = 'Trigger linting for current file' })
+      
+      -- Debug pylint configuration
+      vim.keymap.set('n', '<leader>ld', function()
+        local python_info = get_python_info()
+        print("Pylint Debug Info:")
+        print("  Command:", python_info.cmd)
+        print("  Python Path:", python_info.python_path)
+        print("  Venv Path:", python_info.venv_path or "None")
+        print("  VIRTUAL_ENV:", vim.env.VIRTUAL_ENV or "None")
+        print("  PYTHONPATH:", vim.env.PYTHONPATH or "None")
+        
+        if python_info.venv_path then
+          local site_packages = vim.fn.glob(python_info.venv_path .. '/lib/python*/site-packages')
+          print("  Site Packages:", site_packages ~= '' and site_packages or "Not found")
+        end
+      end, { desc = 'Debug pylint configuration' })
 
       -- Create autocommand which carries out the actual linting
       -- on the specified events.
