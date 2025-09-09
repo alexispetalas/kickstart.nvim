@@ -31,72 +31,72 @@ return {
       --
       -- Configure linters by filetype
       lint.linters_by_ft = {}
-      
+
       -- Enable specific linters for languages we use (only if available)
       -- Python
-      if vim.fn.executable('pylint') == 1 then
+      if vim.fn.executable 'pylint' == 1 then
         lint.linters_by_ft.python = lint.linters_by_ft.python or {}
         table.insert(lint.linters_by_ft.python, 'pylint')
       end
-      if vim.fn.executable('mypy') == 1 then
+      if vim.fn.executable 'mypy' == 1 then
         lint.linters_by_ft.python = lint.linters_by_ft.python or {}
         table.insert(lint.linters_by_ft.python, 'mypy')
       end
-      
+
       -- JavaScript/TypeScript
-      if vim.fn.executable('eslint_d') == 1 or vim.fn.executable('eslint') == 1 then
+      if vim.fn.executable 'eslint_d' == 1 or vim.fn.executable 'eslint' == 1 then
         lint.linters_by_ft.javascript = { 'eslint_d' }
         lint.linters_by_ft.typescript = { 'eslint_d' }
         lint.linters_by_ft.javascriptreact = { 'eslint_d' }
         lint.linters_by_ft.typescriptreact = { 'eslint_d' }
         lint.linters_by_ft.vue = { 'eslint_d' }
       end
-      
+
       -- Go
-      if vim.fn.executable('golangci-lint') == 1 then
+      if vim.fn.executable 'golangci-lint' == 1 then
         lint.linters_by_ft.go = { 'golangci-lint' }
       end
-      
+
       -- Shell
-      if vim.fn.executable('shellcheck') == 1 then
+      if vim.fn.executable 'shellcheck' == 1 then
         lint.linters_by_ft.sh = { 'shellcheck' }
         lint.linters_by_ft.bash = { 'shellcheck' }
         lint.linters_by_ft.zsh = { 'shellcheck' }
       end
-      
+
       -- Docker
-      if vim.fn.executable('hadolint') == 1 then
+      if vim.fn.executable 'hadolint' == 1 then
         lint.linters_by_ft.dockerfile = { 'hadolint' }
       end
-      
+
       -- YAML (remove yamllint as it's causing issues)
       -- lint.linters_by_ft.yaml = { 'yamllint' }
-      
+
       -- JSON
-      if vim.fn.executable('jsonlint') == 1 then
+      if vim.fn.executable 'jsonlint' == 1 then
         lint.linters_by_ft.json = { 'jsonlint' }
       end
-      
+
       -- Markdown (disabled due to noisy warnings)
       -- if vim.fn.executable('markdownlint') == 1 or vim.fn.executable('markdownlint-cli') == 1 then
       --   lint.linters_by_ft.markdown = { 'markdownlint' }
       -- end
-      
+
       -- SQL
-      if vim.fn.executable('sqlfluff') == 1 then
+      if vim.fn.executable 'sqlfluff' == 1 then
         lint.linters_by_ft.sql = { 'sqlfluff' }
       end
-      
+
       -- Vim
-      if vim.fn.executable('vint') == 1 then
+      if vim.fn.executable 'vint' == 1 then
         lint.linters_by_ft.vim = { 'vint' }
       end
-      
+
       -- Lua
-      if vim.fn.executable('luacheck') == 1 then
+      if vim.fn.executable 'luacheck' == 1 then
         lint.linters_by_ft.lua = { 'luacheck' }
       end
-      
+
       -- Disable default linters for unused languages
       lint.linters_by_ft['clojure'] = nil
       lint.linters_by_ft['inko'] = nil
@@ -109,13 +109,13 @@ return {
       -- Configure specific linters
       -- Use venv pylint if available
       local function get_python_path()
-        local venv = os.getenv("VIRTUAL_ENV")
+        local venv = os.getenv 'VIRTUAL_ENV'
         if venv then
-          return venv .. "/bin/pylint"
+          return venv .. '/bin/pylint'
         end
-        return "pylint"
+        return 'pylint'
       end
-      
+
       lint.linters.pylint.cmd = get_python_path()
       lint.linters.pylint.args = {
         '-f',
@@ -155,9 +155,9 @@ return {
           if conda_prefix and vim.fn.isdirectory(conda_prefix .. '/bin') == 1 then
             return conda_prefix
           end
-          
+
           -- Check VIRTUAL_ENV environment variable
-          local venv = os.getenv("VIRTUAL_ENV")
+          local venv = os.getenv 'VIRTUAL_ENV'
           if venv and vim.fn.isdirectory(venv) == 1 then
             return venv
           end
@@ -174,29 +174,29 @@ return {
             return {
               cmd = pylint_cmd,
               python_path = python_path,
-              venv_path = venv_path
+              venv_path = venv_path,
             }
           else
             return {
-              cmd = "pylint",
+              cmd = 'pylint',
               python_path = python_path,
-              venv_path = venv_path
+              venv_path = venv_path,
             }
           end
         end
-        
+
         -- Fallback to system python
         return {
-          cmd = "pylint",
-          python_path = "python",
-          venv_path = nil
+          cmd = 'pylint',
+          python_path = 'python',
+          venv_path = nil,
         }
       end
-      
+
       -- Configure pylint with virtual environment support
       local python_info = get_python_info()
       lint.linters.pylint.cmd = python_info.cmd
-      
+
       -- Enhanced pylint arguments with dynamic virtual environment support
       lint.linters.pylint.args = function()
         local args = {
@@ -204,38 +204,38 @@ return {
           'json',
           '--from-stdin',
         }
-        
+
         local python_info = get_python_info()
         if python_info.venv_path then
           -- Use the virtual environment's Python interpreter
           table.insert(args, '--init-hook=import sys; sys.path.insert(0, "' .. python_info.venv_path .. '/lib/python*/site-packages")')
         end
-        
+
         -- Add the filename
         table.insert(args, vim.api.nvim_buf_get_name(0))
-        
+
         return args
       end
-      
+
       -- Enhanced pylint environment setup
       lint.linters.pylint.env = function()
         local python_info = get_python_info()
         local env = {}
-        
+
         if python_info.venv_path then
           env.VIRTUAL_ENV = python_info.venv_path
-          env.PATH = python_info.venv_path .. '/bin:' .. (os.getenv('PATH') or '')
-          
+          env.PATH = python_info.venv_path .. '/bin:' .. (os.getenv 'PATH' or '')
+
           -- Find the correct site-packages directory
           local site_packages = vim.fn.glob(python_info.venv_path .. '/lib/python*/site-packages')
           if site_packages ~= '' then
-            env.PYTHONPATH = site_packages .. ':' .. (os.getenv('PYTHONPATH') or '')
+            env.PYTHONPATH = site_packages .. ':' .. (os.getenv 'PYTHONPATH' or '')
           end
         end
-        
+
         return env
       end
-      
+
       lint.linters.mypy.args = {
         '--show-column-numbers',
         '--show-error-end',
@@ -248,7 +248,7 @@ return {
           return vim.api.nvim_buf_get_name(0)
         end,
       }
-      
+
       lint.linters['golangci-lint'] = {
         cmd = 'golangci-lint',
         stdin = false,
@@ -285,23 +285,31 @@ return {
       }
 
       -- Manual linting keymap
-      vim.keymap.set('n', '<leader>l', function()
-        lint.try_lint()
+      vim.keymap.set('n', '<leader>ll', function()
+        -- Manually trigger linting for the current buffer and disable if it's
+        -- already running to avoid overlapping linting processes.
+        if lint.is_linting() then
+          lint.disable()
+        end
+        if lint.is_linting() == false then
+          lint.enable()
+          lint.try_lint()
+        end
       end, { desc = 'Trigger linting for current file' })
-      
+
       -- Debug pylint configuration
       vim.keymap.set('n', '<leader>ld', function()
         local python_info = get_python_info()
-        print("Pylint Debug Info:")
-        print("  Command:", python_info.cmd)
-        print("  Python Path:", python_info.python_path)
-        print("  Venv Path:", python_info.venv_path or "None")
-        print("  VIRTUAL_ENV:", vim.env.VIRTUAL_ENV or "None")
-        print("  PYTHONPATH:", vim.env.PYTHONPATH or "None")
-        
+        print 'Pylint Debug Info:'
+        print('  Command:', python_info.cmd)
+        print('  Python Path:', python_info.python_path)
+        print('  Venv Path:', python_info.venv_path or 'None')
+        print('  VIRTUAL_ENV:', vim.env.VIRTUAL_ENV or 'None')
+        print('  PYTHONPATH:', vim.env.PYTHONPATH or 'None')
+
         if python_info.venv_path then
           local site_packages = vim.fn.glob(python_info.venv_path .. '/lib/python*/site-packages')
-          print("  Site Packages:", site_packages ~= '' and site_packages or "Not found")
+          print('  Site Packages:', site_packages ~= '' and site_packages or 'Not found')
         end
       end, { desc = 'Debug pylint configuration' })
 
@@ -319,7 +327,7 @@ return {
           end
         end,
       })
-      
+
       -- Additional autocmd for specific events
       vim.api.nvim_create_autocmd('TextChanged', {
         group = lint_augroup,
