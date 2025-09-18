@@ -18,7 +18,7 @@ return {
       auto_refresh = true,
       search_venv_managers = true,
       search_workspace = true,
-      
+
       -- Hook into venv selection to update linting configuration
       changed_venv_hooks = {
         -- Update pylint configuration when venv changes
@@ -32,7 +32,7 @@ return {
             if site_packages ~= '' then
               vim.env.PYTHONPATH = site_packages .. ':' .. (vim.env.PYTHONPATH or '')
             end
-            
+
             -- Update pylint command to use the virtual environment
             local pylint_cmd = venv_path .. '/bin/pylint'
             if vim.fn.executable(pylint_cmd) == 1 then
@@ -40,7 +40,7 @@ return {
             else
               lint.linters.pylint.cmd = "pylint"
             end
-            
+
             -- Re-run linting for all Python buffers
             vim.defer_fn(function()
               for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -50,7 +50,7 @@ return {
               end
             end, 100)
           end
-          
+
           -- Notify user of venv change
           if venv_path then
             vim.notify('Virtual environment changed to: ' .. venv_path, vim.log.levels.INFO)

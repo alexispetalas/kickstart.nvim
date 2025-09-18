@@ -6,23 +6,23 @@ return {
     'nvim-telescope/telescope-file-browser.nvim',
     dependencies = { 'nvim-telescope/telescope.nvim' },
   },
-  
+
   {
     'nvim-telescope/telescope-live-grep-args.nvim',
     version = '^1.0.0',
     dependencies = { 'nvim-telescope/telescope.nvim' },
   },
-  
+
   {
     'nvim-telescope/telescope-project.nvim',
     dependencies = { 'nvim-telescope/telescope.nvim' },
   },
-  
+
   {
     'nvim-telescope/telescope-symbols.nvim',
     dependencies = { 'nvim-telescope/telescope.nvim' },
   },
-  
+
   {
     'debugloop/telescope-undo.nvim',
     dependencies = { 'nvim-telescope/telescope.nvim' },
@@ -55,7 +55,7 @@ return {
       { '<leader>fQ', '<cmd>Telescope quickfixhistory<cr>', desc = 'Quickfix History' },
       { '<leader>fr', '<cmd>Telescope registers<cr>', desc = 'Registers' },
       { '<leader>ft', '<cmd>Telescope filetypes<cr>', desc = 'File Types' },
-      
+
       -- Search operations
       { '<leader>sa', '<cmd>Telescope autocommands<cr>', desc = '[S]earch [A]utocommands' },
       { '<leader>sb', '<cmd>Telescope current_buffer_fuzzy_find<cr>', desc = '[S]earch in current [B]uffer' },
@@ -71,14 +71,14 @@ return {
       { '<leader>st', '<cmd>Telescope live_grep_args<cr>', desc = '[S]earch [T]ext with args' },
       { '<leader>sT', '<cmd>Telescope treesitter<cr>', desc = '[S]earch [T]reesitter symbols' },
       { '<leader>sy', '<cmd>Telescope filetypes<cr>', desc = '[S]earch file t[Y]pes' },
-      
+
       -- Git operations
       { '<leader>sGb', '<cmd>Telescope git_branches<cr>', desc = '[S]earch [G]it [B]ranches' },
       { '<leader>sGc', '<cmd>Telescope git_commits<cr>', desc = '[S]earch [G]it [C]ommits' },
       { '<leader>sGC', '<cmd>Telescope git_bcommits<cr>', desc = '[S]earch [G]it buffer [C]ommits' },
       { '<leader>sGs', '<cmd>Telescope git_status<cr>', desc = '[S]earch [G]it [S]tatus' },
       { '<leader>sGt', '<cmd>Telescope git_stash<cr>', desc = '[S]earch [G]it s[T]ash' },
-      
+
       -- LSP operations
       { '<leader>sld', '<cmd>Telescope diagnostics<cr>', desc = '[S]earch [L]SP [D]iagnostics' },
       { '<leader>sls', '<cmd>Telescope lsp_document_symbols<cr>', desc = '[S]earch [L]SP document [S]ymbols' },
@@ -86,7 +86,7 @@ return {
       { '<leader>slr', '<cmd>Telescope lsp_references<cr>', desc = '[S]earch [L]SP [R]eferences' },
       { '<leader>sli', '<cmd>Telescope lsp_implementations<cr>', desc = '[S]earch [L]SP [I]mplementations' },
       { '<leader>slt', '<cmd>Telescope lsp_type_definitions<cr>', desc = '[S]earch [L]SP [T]ype definitions' },
-      
+
       -- Project management
       { '<leader>pp', '<cmd>Telescope project<cr>', desc = 'Switch [P]roject' },
       { '<leader>pr', '<cmd>Telescope oldfiles cwd_only=true<cr>', desc = '[P]roject [R]ecent files' },
@@ -96,7 +96,7 @@ return {
     config = function()
       -- Only load extensions, don't call setup again
       local telescope = require 'telescope'
-      
+
       -- Load extensions
       pcall(telescope.load_extension, 'file_browser')
       pcall(telescope.load_extension, 'live_grep_args')

@@ -97,7 +97,7 @@ return {
         map('n', '<leader>hD', function()
           gitsigns.diffthis '@'
         end, { desc = 'git [D]iff against last commit' })
-        
+
         -- Additional navigation
         map('n', '<leader>hj', function()
           gitsigns.nav_hunk 'next'
@@ -111,7 +111,7 @@ return {
         map('n', '<leader>hl', function()
           gitsigns.nav_hunk 'last'
         end, { desc = 'Jump to last git hunk' })
-        
+
         -- Toggles
         map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
         map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
@@ -119,7 +119,7 @@ return {
         map('n', '<leader>tl', gitsigns.toggle_linehl, { desc = '[T]oggle git [l]ine highlight' })
         map('n', '<leader>tn', gitsigns.toggle_numhl, { desc = '[T]oggle git [n]umber highlight' })
         map('n', '<leader>ts', gitsigns.toggle_signs, { desc = '[T]oggle git [s]igns' })
-        
+
         -- Text object
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'Select git hunk' })
       end,
