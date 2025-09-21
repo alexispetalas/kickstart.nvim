@@ -23,11 +23,10 @@ return {
   },
   opts = {
     filesystem = {
-      follow_current_file = true, -- This will follow the current file in the tree
---      follow_current_file {
---        enabled = true, -- This will enable the feature
---        leave_dirs_open = false, -- This will close the directories that are not in the path of the current file
---      },
+      follow_current_file = {
+        enabled = true, -- This will enable the feature
+        leave_dirs_open = false, -- This will close the directories that are not in the path of the current file
+      },
       use_libuv_file_watcher = true, -- Auto-refresh on filesystem changes
       window = {
         mappings = {
