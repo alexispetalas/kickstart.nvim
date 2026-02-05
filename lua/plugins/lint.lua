@@ -193,9 +193,12 @@ return {
         }
       end
 
-      -- Configure pylint with virtual environment support
-      local python_info = get_python_info()
-      lint.linters.pylint.cmd = python_info.cmd
+      -- Configure pylint with dynamic virtual environment support
+      -- Defer expensive venv detection until actually needed
+      lint.linters.pylint.cmd = function()
+        local python_info = get_python_info()
+        return python_info.cmd
+      end
 
       -- Enhanced pylint arguments with dynamic virtual environment support
       lint.linters.pylint.args = function()

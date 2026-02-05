@@ -7,7 +7,7 @@ return {
     'mfussenegger/nvim-lint', -- Add lint as dependency
     { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
   },
-  lazy = false,
+  ft = 'python', -- Only load when opening Python files
   keys = {
     { '<leader>vs', '<cmd>VenvSelect<cr>', desc = 'Select virtual environment' },
     { '<leader>ve', '<cmd>VenvSelectCached<cr>', desc = 'Select cached venv' },
