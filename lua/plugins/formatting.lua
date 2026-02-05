@@ -64,7 +64,7 @@ return { -- Autoformat
         prepend_args = { '--profile', 'black' },
       },
       prettier = {
-        prepend_args = { '--tab-width', '2', '--single-quote' },
+        prepend_args = { '--tab-width', '2' },
       },
       shfmt = {
         prepend_args = { '-i', '2', '-ci' },
