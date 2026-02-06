@@ -98,7 +98,7 @@ return {
     'hedyhli/outline.nvim',
     cmd = { 'Outline', 'OutlineOpen' },
     keys = {
-      { '<leader>o', '<cmd>Outline<CR>', desc = 'Toggle Outline' },
+      { '<leader>oo', '<cmd>Outline<CR>', desc = 'Toggle Outline' },
     },
     opts = {
       outline_window = {
@@ -106,13 +106,13 @@ return {
         width = 25,
         relative_width = true,
         auto_close = false,
-        auto_jump = false,
+        auto_jump = true,
         jump_highlight_duration = 300,
         center_on_jump = true,
         show_numbers = false,
         show_relative_numbers = false,
         wrap = false,
-        focus_on_open = false,
+        focus_on_open = true,
         winhl = '',
       },
       outline_items = {
@@ -135,7 +135,7 @@ return {
         },
       },
       symbol_folding = {
-        autofold_depth = 1,
+        autofold_depth = 5,
         auto_unfold = {
           hovered = true,
           only = true,
@@ -187,7 +187,6 @@ return {
         icon_fetcher = function(kind, bufnr)
           return require('mini.icons').get('lsp', kind)
         end,
-        icon_source = 'lspkind',
       },
     },
   },

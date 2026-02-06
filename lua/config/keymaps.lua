@@ -9,3 +9,7 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<leader>sz', ':Telescope find_files search_dirs={"~/notes"}<cr>')
+vim.keymap.set('n', '<leader>sZ', ':Telescope live_grep search_dirs={"~/notes"}<cr>')
+-- convert note to template and remove leading white space
+vim.keymap.set('n', '<leader>on', ':ObsidianTemplate note<cr>')

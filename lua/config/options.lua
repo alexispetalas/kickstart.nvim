@@ -20,8 +20,14 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
+vim.opt.conceallevel = 1
 
 -- Sync clipboard between OS and Neovim.
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
+-- Indentation settings
+vim.o.tabstop = 4 -- Number of spaces a tab counts for
+vim.o.shiftwidth = 4 -- Number of spaces for each indentation
+vim.o.expandtab = true -- Use spaces instead of tabs
+vim.o.smartindent = true -- Smart indenting
