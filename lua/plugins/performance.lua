@@ -173,8 +173,7 @@ return {
             Hint = ' ',
             Info = ' ',
           }
-          local ret = (diag.error and icons.Error .. diag.error .. ' ' or '')
-            .. (diag.warning and icons.Warn .. diag.warning or '')
+          local ret = (diag.error and icons.Error .. diag.error .. ' ' or '') .. (diag.warning and icons.Warn .. diag.warning or '')
           return vim.trim(ret)
         end,
         offsets = {
@@ -225,12 +224,22 @@ return {
         desc = 'Delete Buffer',
       },
       {
-        '<leader>bD',
-        function()
-          require('mini.bufremove').delete(0, true)
-        end,
-        desc = 'Delete Buffer (Force)',
+        '<S-tab>',
+        '<cmd>bprevious<cr>',
+        desc = 'Prev Buffer',
       },
+      {
+        '<tab>',
+        '<cmd>bnext<cr>',
+        desc = 'Next Buffer',
+      },
+      --{
+      --  '<leader>bD',
+      --  function()
+      --    require('mini.bufremove').delete(0, true)
+      --  end,
+      --  desc = 'Delete Buffer (Force)',
+      --},
     },
   },
 }

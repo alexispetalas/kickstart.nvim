@@ -140,8 +140,18 @@ return { -- Fuzzy Finder (files, lsp, etc)
       -- You can put your default mappings / updates / etc. in here
       --  All the info you're looking for is in `:help telescope.setup()`
       --
-      -- defaults = {
-      --   mappings = {
+      defaults = {
+        layout_strategy = 'vertical',
+        layout_config = {
+          preview_height = 0.7,
+          vertical = {
+            size = {
+              width = '95%',
+              height = '95%',
+            },
+          },
+        },
+      },
       --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
       --   },
       -- },
