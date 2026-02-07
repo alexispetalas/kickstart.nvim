@@ -19,7 +19,11 @@ return { -- Fuzzy Finder (files, lsp, etc)
     {
       '<leader>sf',
       function()
-        require('telescope.builtin').find_files()
+        require('telescope.builtin').find_files(require('telescope.themes').get_dropdown {
+          layout_config = { anchor = 'N', mirror = true, prompt_position = 'top', width = 0.9, height = 0.4 },
+          winblend = 10,
+          previewer = true,
+        })
       end,
       desc = '[S]earch [F]iles',
     },
@@ -33,21 +37,25 @@ return { -- Fuzzy Finder (files, lsp, etc)
     {
       '<leader>sw',
       function()
-        require('telescope.builtin').grep_string()
+        require('telescope.builtin').grep_string(require('telescope.themes').get_ivy { winblend = 10, previewer = false })
       end,
       desc = '[S]earch current [W]ord',
     },
     {
       '<leader>sg',
       function()
-        require('telescope.builtin').live_grep()
+        require('telescope.builtin').live_grep(require('telescope.themes').get_dropdown {
+          layout_config = { anchor = 'N', mirror = true, prompt_position = 'top', width = 0.9, height = 0.4 },
+          winblend = 10,
+          previewer = true,
+        })
       end,
       desc = '[S]earch by [G]rep',
     },
     {
       '<leader>sd',
       function()
-        require('telescope.builtin').diagnostics()
+        require('telescope.builtin').diagnostics(require('telescope.themes').get_ivy { winblend = 10, previewer = false })
       end,
       desc = '[S]earch [D]iagnostics',
     },
@@ -68,7 +76,11 @@ return { -- Fuzzy Finder (files, lsp, etc)
     {
       '<leader><leader>',
       function()
-        require('telescope.builtin').buffers()
+        require('telescope.builtin').buffers(require('telescope.themes').get_dropdown {
+          layout_config = { anchor = 'N', mirror = true, prompt_position = 'top', width = 0.9, height = 0.4 },
+          winblend = 10,
+          previewer = true,
+        })
       end,
       desc = '[ ] Find existing buffers',
     },
@@ -141,27 +153,30 @@ return { -- Fuzzy Finder (files, lsp, etc)
       --  All the info you're looking for is in `:help telescope.setup()`
       --
       defaults = {
-        layout_strategy = 'vertical',
+        -- 1. Use the 'center' strategy which dropdown is built on
+        layout_strategy = 'center',
+
+        -- 2. Apply your specific dropdown configurations
         layout_config = {
-          preview_height = 0.7,
-          vertical = {
-            size = {
-              width = '95%',
-              height = '95%',
-            },
-          },
+          anchor = 'N',
+          mirror = true,
+          prompt_position = 'top',
+          width = 0.9,
+          height = 0.4,
         },
+
+        -- 3. Match the visual style of get_dropdown
+        winblend = 10,
+        previewer = true, -- Set to false if you want the classic dropdown look without a preview
+        sorting_strategy = 'ascending', -- Usually paired with prompt_position = 'top'
+        border = true,
       },
       --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
       --   },
       -- },
       -- pickers = {}
       extensions = {
-        ['ui-select'] = {
-          require('telescope.themes').get_ivy(),
-        },
         file_browser = {
-          theme = 'ivy',
           hijack_netrw = true,
         },
         live_grep_args = {
@@ -173,7 +188,6 @@ return { -- Fuzzy Finder (files, lsp, etc)
             { '~/.config', max_depth = 1 },
           },
           hidden_files = false,
-          theme = 'dropdown',
         },
         undo = {
           use_delta = true,
@@ -216,10 +230,5 @@ return { -- Fuzzy Finder (files, lsp, etc)
         prompt_title = 'Live Grep in Open Files',
       }
     end, { desc = '[S]earch [/] in Open Files' })
-
-    -- Shortcut for searching your Neovim configuration files
-    vim.keymap.set('n', '<leader>sn', function()
-      builtin.find_files { cwd = vim.fn.stdpath 'config' }
-    end, { desc = '[S]earch [N]eovim files' })
   end,
 }
