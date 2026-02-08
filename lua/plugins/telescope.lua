@@ -1,4 +1,3 @@
--- stylua: ignore start
 local function ivy(opts)
   return require('telescope.themes').get_ivy(vim.tbl_extend('force', {
     winblend = 10,
@@ -8,8 +7,10 @@ end
 
 return {
   'nvim-telescope/telescope.nvim',
-  cmd = 'Telescope', keys = {
-   -- Core pickers (themed)
+  cmd = 'Telescope',
+  -- stylua: ignore start
+  keys = {
+    -- Core pickers (themed)
     { '<leader>sf', function() require('telescope.builtin').find_files() end, desc = '[S]earch [F]iles' },
     { '<leader>sg', function() require('telescope.builtin').live_grep() end, desc = '[S]earch by [G]rep' },
     { '<leader>sw', function() require('telescope.builtin').grep_string(ivy()) end, desc = '[S]earch current [W]ord' },
@@ -115,10 +116,9 @@ return {
         border = true,
       },
       extensions = {
-        ["ui-select"] = {
-          require("telescope.themes").get_dropdown {
-            -- even more opts
-          }},
+        ['ui-select'] = {
+          require('telescope.themes').get_dropdown {},
+        },
         file_browser = {
           hijack_netrw = true,
         },
