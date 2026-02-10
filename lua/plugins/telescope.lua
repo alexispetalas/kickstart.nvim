@@ -63,6 +63,7 @@ return {
     { '<leader>sGC', function() require('telescope.builtin').git_bcommits() end, desc = '[S]earch [G]it buffer [C]ommits' },
     { '<leader>sGs', function() require('telescope.builtin').git_status() end, desc = '[S]earch [G]it [S]tatus' },
     { '<leader>sGt', function() require('telescope.builtin').git_stash() end, desc = '[S]earch [G]it s[T]ash' },
+    { '<leader>sGf', function() require('telescope.builtin').git_files() end, desc = '[S]earch [G]it [F]iles' },
 
     -- LSP operations
     { '<leader>sld', function() require('telescope.builtin').diagnostics() end, desc = '[S]earch [L]SP [D]iagnostics' },
