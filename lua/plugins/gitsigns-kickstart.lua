@@ -86,7 +86,8 @@ return {
         map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
         map('n', '<leader>hu', gitsigns.stage_hunk, { desc = 'git [u]ndo stage hunk' })
         map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
-        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
+        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk (float)' })
+        map('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'git preview hunk [i]nline' })
         map('n', '<leader>hb', function()
           gitsigns.blame_line { full = true }
         end, { desc = 'git [b]lame line' })
@@ -122,6 +123,11 @@ return {
 
         -- Text object
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'Select git hunk' })
+
+        -- Command: :HunkDiff -> diff preview for current hunk
+        vim.api.nvim_buf_create_user_command(bufnr, 'HunkDiff', function()
+          gitsigns.preview_hunk()
+        end, { desc = 'Preview current git hunk (float)' })
       end,
     },
   },
