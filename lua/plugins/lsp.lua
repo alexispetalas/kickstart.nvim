@@ -466,6 +466,8 @@ return {
       ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
       automatic_installation = false,
       handlers = {
+        -- stylua does not support --lsp in v2.x; use it via conform.nvim instead
+        stylua = function() end,
         function(server_name)
           local server = servers[server_name] or {}
           -- This handles overriding only values explicitly passed

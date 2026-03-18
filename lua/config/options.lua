@@ -21,6 +21,7 @@ vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
 vim.opt.conceallevel = 1
+vim.o.selection = "inclusive"
 
 -- Sync clipboard between OS and Neovim.
 vim.schedule(function()
