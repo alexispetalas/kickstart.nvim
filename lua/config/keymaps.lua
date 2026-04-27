@@ -13,3 +13,5 @@ vim.keymap.set('n', '<leader>sz', ':Telescope find_files search_dirs={"~/.nb"}<c
 vim.keymap.set('n', '<leader>sZ', ':Telescope live_grep search_dirs={"~/.nb"}<cr>')
 -- convert note to template and remove leading white space
 vim.keymap.set('n', '<leader>on', ':ObsidianTemplate note<cr>')
+vim.keymap.set('i', '<C-s>', '<C-o>:w<ENTER>')
+vim.keymap.set('n', '<C-s>', ':w<ENTER>')
