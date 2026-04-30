@@ -24,10 +24,8 @@ vim.opt.conceallevel = 1
 vim.o.selection = "inclusive"
 
 -- Sync clipboard between OS and Neovim.
---vim.schedule(function()
---  vim.o.clipboard = 'unnamedplus'
---end)
 -- Indentation settings
+vim.o.clipboard = 'unnamedplus'
 vim.o.tabstop = 4 -- Number of spaces a tab counts for
 vim.o.shiftwidth = 4 -- Number of spaces for each indentation
 vim.o.expandtab = true -- Use spaces instead of tabs

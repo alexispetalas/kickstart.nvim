@@ -15,3 +15,7 @@ vim.keymap.set('n', '<leader>sZ', ':Telescope live_grep search_dirs={"~/.nb"}<cr
 vim.keymap.set('n', '<leader>on', ':ObsidianTemplate note<cr>')
 vim.keymap.set('i', '<C-s>', '<C-o>:w<ENTER>')
 vim.keymap.set('n', '<C-s>', ':w<ENTER>')
+
+-- Paste over visual selection without overwriting the clipboard
+vim.keymap.set('x', 'p', '"_dP', { noremap = true, silent = true })
+vim.keymap.set('x', 'P', '"_dP', { noremap = true, silent = true })
