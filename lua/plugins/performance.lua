@@ -4,6 +4,7 @@ return {
   -- Notifications
   {
     'rcarriga/nvim-notify',
+    enabled = false,
     keys = {
       {
         '<leader>un',

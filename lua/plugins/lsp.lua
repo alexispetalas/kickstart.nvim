@@ -35,7 +35,7 @@ return {
         map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
 
         -- Find references for the word under your cursor.
-        map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+        map('grr', function() require('telescope.builtin').lsp_references({ layout_strategy = 'vertical', layout_config = { width = 0.8, height = 0.9, preview_cutoff = 40, mirror = true }, fname_width = 50, show_line = true }) end, '[G]oto [R]eferences')
 
         -- Jump to the implementation of the word under your cursor.
         --  Useful when your language has ways of declaring types without an actual implementation.

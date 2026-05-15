@@ -6,7 +6,7 @@ return { -- Autoformat
     {
       '<leader>ff',
       function()
-        require('conform').format { async = false, lsp_format = 'fallback' }
+        require('conform').format { async = false, lsp_format = 'fallback', timeout_ms = 5000 }
       end,
       mode = 'n',
       desc = '[F]ormat buffer',
@@ -18,8 +18,8 @@ return { -- Autoformat
       --format_on_save = false,
       formatters_by_ft = {
         lua = { 'stylua' },
-        python = { 'isort', 'black' },
-        go = { 'goimports', 'gofumpt' },
+        python = { 'black' },
+        go = { 'goimports' },
         rust = { 'rustfmt' },
         javascript = { 'prettier' },
         typescript = { 'prettier' },

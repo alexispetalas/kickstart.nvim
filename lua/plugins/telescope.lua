@@ -69,7 +69,7 @@ return {
     { '<leader>sld', function() require('telescope.builtin').diagnostics() end, desc = '[S]earch [L]SP [D]iagnostics' },
     { '<leader>sls', function() require('telescope.builtin').lsp_document_symbols() end, desc = '[S]earch [L]SP document [S]ymbols' },
     { '<leader>slS', function() require('telescope.builtin').lsp_workspace_symbols() end, desc = '[S]earch [L]SP workspace [S]ymbols' },
-    { '<leader>slr', function() require('telescope.builtin').lsp_references() end, desc = '[S]earch [L]SP [R]eferences' },
+    { '<leader>slr', function() require('telescope.builtin').lsp_references({ layout_strategy = 'vertical', layout_config = { width = 0.8, height = 0.9, preview_cutoff = 40, mirror = true }, fname_width = 50, show_line = true }) end, desc = '[S]earch [L]SP [R]eferences' },
     { '<leader>sli', function() require('telescope.builtin').lsp_implementations() end, desc = '[S]earch [L]SP [I]mplementations' },
     { '<leader>slt', function() require('telescope.builtin').lsp_type_definitions() end, desc = '[S]earch [L]SP [T]ype definitions' },
 

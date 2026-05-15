@@ -1,6 +1,5 @@
 return { -- Autocompletion
   'saghen/blink.cmp',
-  event = 'InsertEnter',
   version = '1.*',
   dependencies = {
     -- Snippet Engine

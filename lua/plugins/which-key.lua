@@ -1,6 +1,6 @@
 return {
   'folke/which-key.nvim',
-  enabled = false,
+  enabled = true,
   event = 'VimEnter',
   opts = {
     -- delay between pressing a key and opening which-key (milliseconds)
