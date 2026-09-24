@@ -19,3 +19,22 @@ vim.keymap.set('n', '<C-s>', ':w<ENTER>')
 -- Paste over visual selection without overwriting the clipboard
 vim.keymap.set('x', 'p', '"_dP', { noremap = true, silent = true })
 vim.keymap.set('x', 'P', '"_dP', { noremap = true, silent = true })
+
+-- Throwaway scratch buffers: nofile + wipe on hide so they never nag about
+-- unsaved changes. `:w <path>` still works if one turns out to be worth keeping.
+local function scratch(cmd)
+  return function()
+    if cmd then
+      vim.cmd(cmd)
+    end
+    vim.cmd 'enew'
+    vim.bo.buftype = 'nofile'
+    vim.bo.bufhidden = 'wipe'
+    vim.bo.swapfile = false
+    vim.bo.buflisted = true
+  end
+end
+
+vim.keymap.set('n', '<leader>bn', scratch(), { desc = 'New scratch buffer' })
+vim.keymap.set('n', '<leader>bv', scratch 'vsplit', { desc = 'New scratch buffer (vsplit)' })
+vim.keymap.set('n', '<leader>bs', scratch 'split', { desc = 'New scratch buffer (split)' })
